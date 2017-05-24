@@ -2,7 +2,51 @@ from time import time
 from random import Random
 import inspyred
 import random
+import os
+import codecs
 
+def get_problem(file):
+
+    #os.chdir("/home/ptan/Triforce/OR5x100")
+    
+    #f = codecs.open('OR5x100-0.25_1.dat', encoding='utf-8')
+    f = codecs.open(file, encoding='utf-8')
+    
+    knap = []
+    
+    for line in f:
+        knap.append(line)
+        
+    f.close()
+    
+    for i in range (0, len(knap)):
+        knap[i] = knap[i].split(' ')
+        if knap[i][0] == '':
+            knap[i] = knap[i][1:]
+        if knap[i][len(knap[i]) - 1] == '\r\n':
+            knap[i] = knap[i][:-1]
+    
+    number_of_objects = int(knap[0][0])
+    number_of_dimensions = int(knap[0][1])
+    knapsack_capacities = []
+
+    knap = knap[:-1]
+    knap = [int(item) for sublist in knap for item in sublist]
+    
+    for i in range(0, number_of_dimensions):
+        knapsack_capacities.append(knap[len(knap) - i - 1])
+    
+    items = []
+    
+    for i in range (0, number_of_objects):
+        item = []
+        for j in range (0, len(knapsack_capacities) + 1):
+            item.append(knap[i + j * number_of_objects])
+        items.append(item)
+    
+    return (knapsack_capacities, items)
+    
+    
 #needed to define the custom knapsack class (copied directly from source)
 class Benchmark(object):
     
@@ -73,20 +117,25 @@ class myKnapsack(Benchmark):
                     total += c.value
                 fitness.append(total)
         else:
-            #included an extra dimension (volume)
+            #number of constraints (total dimensions-1)
+            num_constr = len(self.capacity)
             for candidate in candidates:
+                list_total_constraints = [0]*num_constr
                 total_value = 0
-                total_weight = 0
-                total_volume = 0
+                
                 for c, i in zip(candidate, self.items):
-                    total_weight += c * i[0]
-                    total_volume += c * i[1]
-                    total_value += c * i[2]
-                #if either total weight or volume exceeds its capacity->fitness is difference
-                if total_weight > self.capacity[0] or total_volume > self.capacity[1]:
-                    fitness.append(self.capacity[0] - total_weight + self.capacity[1] - total_volume)
-                else:
-                    fitness.append(total_value)
+                   
+                    for d in range(0,num_constr):
+                        list_total_constraints[d] += c * i[d]
+                    total_value += c * i[num_constr]
+                
+                
+                for x in range(0,num_constr):
+                    if list_total_constraints[x] > self.capacity[x]:
+                        fitness.append(sum(self.capacity) - sum(list_total_constraints))
+                        break
+                    else:
+                        fitness.append(total_value)
         return fitness
 
 
@@ -95,22 +144,11 @@ def main(prng=None, display=False):
         prng = Random()
         prng.seed(time()) 
     
-    items1 = [(7,369), (10,346), (11,322), (10,347), (12,348), (13,383), 
-             (8,347), (11,364), (8,340), (8,324), (13,365), (12,314), 
-             (13,306), (13,394), (7,326), (11,310), (9,400), (13,339), 
-             (5,381), (14,353), (6,383), (9,317), (6,349), (11,396), 
-             (14,353), (9,322), (5,329), (5,386), (5,382), (4,369), 
-             (6,304), (10,392), (8,390), (8,307), (10,318), (13,359), 
-             (9,378), (8,376), (11,330), (9,331)]
-
-    #just for testing, dimensions/capacity are hardcoded; takes generated list of tuples with 3 dimensions
-    dims = 3
-    mylist = [(random.randint(1, 15), random.randint(1, 15), random.randint(300, 400)) for k in range(40)]
-    print(mylist)
-    capacity =[15, 15]
+    
+    capacities, itemslist = get_problem('C:\Users\User\Desktop\Dataset\OR5x250\OR5x250-0.25_2.dat')
     
     
-    problem = myKnapsack(capacity, mylist, duplicates=False) #use custom class
+    problem = myKnapsack(capacities, itemslist, duplicates=False) #use custom class
     ea = inspyred.swarm.PSO(prng)
     ea.terminator = inspyred.ec.terminators.evaluation_termination
     ea.topology = inspyred.swarm.topologies.ring_topology
