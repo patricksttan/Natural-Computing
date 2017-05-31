@@ -45,7 +45,5 @@ def get_problem(file):
         for j in range (0, number_of_dimensions + 1):
             item.append(knap[i + j * number_of_objects])
         items.append(item)
-    
-    print (knapsack_capacities)
-    print (len(items))
+
     return (knapsack_capacities, items)
