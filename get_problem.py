@@ -36,7 +36,7 @@ def get_problem(file):
     knap = [int(item) for sublist in knap for item in sublist]        
         
     for i in range(number_of_objects * (number_of_dimensions + 1), len(knap)):
-        knapsack_capacities.append(knap[len(knap) - i - 1])
+        knapsack_capacities.append(knap[i])
         
     items = []
         
@@ -47,3 +47,4 @@ def get_problem(file):
         items.append(item)
 
     return (knapsack_capacities, items)
+
