@@ -134,7 +134,7 @@ fitness_list = []
 diff_list = []
 
 for i in range(0,run):
-    #print ('Run number : ',i+1)
+    print (i)
     prng = Random()
     prng.seed(time())
 
