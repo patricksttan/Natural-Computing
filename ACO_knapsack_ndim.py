@@ -13,6 +13,7 @@ from time import time
 import math
 import inspyred
 import numpy
+import numpy as np
 from get_problem import get_problem
 
 class Benchmark(object):
