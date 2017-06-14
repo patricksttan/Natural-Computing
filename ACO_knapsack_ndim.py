@@ -107,14 +107,14 @@ class Knapsack(Benchmark):
                 sumElement = np.zeros((len(self.capacity)))
 
                 for c in candidate:
-                    for i in range(0,len(c.element)):
-                        #total += 0 - abs(capa[i] - c.element[i])
-                        sumElement[i] += c.element[i]
+#                     for i in range(0,len(c.element)):
+#                         #total += 0 - abs(capa[i] - c.element[i])
+#                         sumElement[i] += c.element[i]
 
                     total += c.value
 
-                for i in range(0, len(sumElement)):
-                    total += 0 - abs(capa[i] - sumElement[i])
+#                 for i in range(0, len(sumElement)):
+#                     total += 0 - abs(capa[i] - sumElement[i])
 
                 fitness.append(total)
         return fitness
