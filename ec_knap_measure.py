@@ -129,61 +129,60 @@ class myKnapsack(Benchmark):
                     total_value += c * i[num_constr]
                 
                 
+                check = 0
                 for x in range(0,num_constr):
                     if list_total_constraints[x] <= self.capacity[x]:
-                        fitness.append(total_value)
+                        check += 1
+                if check == num_constr:
+                    fitness.append(total_value)
+                else:
+                    fitness.append(0)    
         return fitness
 
 
-def main(prng=None, display=False):
-    if prng is None:
-        prng = Random()
-        prng.seed(time()) 
-    
-    
-    capacities, itemslist = get_problem('C:\Users\User\Desktop\Dataset\OR5x100\OR5x100-0.25_1.dat')
-    
-    
-    problem = myKnapsack(capacities, itemslist, duplicates=False) #use custom class
-    #ea = inspyred.ec.GA(prng)
-    ea = inspyred.swarm.PSO(prng)
-    ea.terminator = inspyred.ec.terminators.evaluation_termination
-    ea.topology = inspyred.swarm.topologies.ring_topology
-    
-    fitness_list = []
-    diff_list = []
-    
-    #get the fitness list of 100 algorithm runs
-    for i in range(0,100):
-        final_pop = ea.evolve(generator=problem.generator,
-                          evaluator=problem.evaluator, 
-                          pop_size=100,
-                          bounder=problem.bounder,
-                          maximize=problem.maximize,
-                          max_evaluations=30000, 
-                          neighborhood_size=5)
-                          #num_elites=1)
 
-        best = max(final_pop)
-        fitness_list.append(best.fitness)
-             
-    print('Fitness list: \n{0}'.format(str(fitness_list)))
-    
-    best_fitness = max(fitness_list)    
-    worst_fitness = min(fitness_list)
-    #how many times algorithm produces best fitness value
-    success_rate = fitness_list.count(best_fitness)/100.0
-    for fitness in fitness_list:
-        diff_list.append(best_fitness-fitness)
-    #average of difference between each value and the best fitness    
-    mean_abs_diff = sum(diff_list)/100.0
-    mean_abs_per_err = mean_abs_diff/best_fitness
-    #least difference (not counting best fitness)
-    least_err = min(item for item in diff_list if item>0)
-    #standard deviation of fitness list
-    alg_std = numpy.std(fitness_list)
-    
-    return ea
+prng = Random()
+prng.seed(time()) 
 
-if __name__ == '__main__':
-    main(display=True)
+capacities, itemslist = get_problem('C:\Users\User\Desktop\Dataset\OR5x100\OR5x100-0.25_1.dat')
+
+
+problem = myKnapsack(capacities, itemslist, duplicates=False) #use custom class
+#ea = inspyred.ec.GA(prng)
+ea = inspyred.swarm.PSO(prng)
+ea.terminator = inspyred.ec.terminators.evaluation_termination
+ea.topology = inspyred.swarm.topologies.ring_topology
+
+fitness_list = []
+diff_list = []
+
+#get the fitness list of 100 algorithm runs
+for i in range(0,100):
+    print(i)
+    final_pop = ea.evolve(generator=problem.generator,
+                        evaluator=problem.evaluator, 
+                        pop_size=100,
+                        bounder=problem.bounder,
+                        maximize=problem.maximize,
+                        max_evaluations=30000, 
+                        neighborhood_size=5)
+                        #num_elites=1)
+
+    best = max(final_pop)
+    fitness_list.append(best.fitness)
+            
+print('Fitness list: \n{0}'.format(str(fitness_list)))
+
+best_fitness = max(fitness_list)    
+worst_fitness = min(fitness_list)
+#how many times algorithm produces best fitness value
+success_rate = fitness_list.count(best_fitness)/100.0
+for fitness in fitness_list:
+    diff_list.append(best_fitness-fitness)
+#average of difference between each value and the best fitness    
+mean_abs_diff = sum(diff_list)/100.0
+mean_abs_per_err = mean_abs_diff/best_fitness
+#least difference (not counting best fitness)
+least_err = min(item for item in diff_list if item>0)
+#standard deviation of fitness list
+alg_std = numpy.std(fitness_list)
