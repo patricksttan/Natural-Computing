@@ -17,41 +17,43 @@ def get_chance(file):
 
 def get_problem(file):
 
-    #os.chdir("/home/ptan/Triforce/OR5x100")
-    
-    #f = codecs.open('C:\Users\User\Desktop\Dataset\OR5x100\OR5x100-0.25_1.dat', encoding='utf-8')
     f = codecs.open(file, encoding='utf-8')
-    
+        
     knap = []
-    
+        
     for line in f:
         knap.append(line)
-        
+            
     f.close()
-    
+        
     for i in range (0, len(knap)):
         knap[i] = knap[i].split(' ')
         if knap[i][0] == '':
             knap[i] = knap[i][1:]
         if knap[i][len(knap[i]) - 1] == '\r\n':
             knap[i] = knap[i][:-1]
-    
+        
     number_of_objects = int(knap[0][0])
     number_of_dimensions = int(knap[0][1])
-    knapsack_capacities = knap[len(knap)-1:]
-    knapsack_capacities = [int(item) for list in knapsack_capacities for item in list]
+    knapsack_capacities = []
     
-    knap = knap[1:-1]
-    knap = [int(item) for sublist in knap for item in sublist]
+    if knap[len(knap)-1][len(knap[len(knap)-1])-1] == '':
+        knap[len(knap)-1] = knap[len(knap)-1][:-1]    
     
+    knap = knap[1:]
+    knap = [int(item) for sublist in knap for item in sublist]        
+        
+    for i in range(number_of_objects * (number_of_dimensions + 1), len(knap)):
+        knapsack_capacities.append(knap[i])
+        
     items = []
-    
+        
     for i in range (0, number_of_objects):
         item = []
-        for j in range (0, len(knapsack_capacities) + 1):
+        for j in range (0, number_of_dimensions + 1):
             item.append(knap[i + j * number_of_objects])
         items.append(item)
-    
+
     return (knapsack_capacities, items)
     
     
@@ -112,7 +114,7 @@ class myKnapsack(Benchmark):
             return [random.randint(0, m) for m in max_count]
         else:
             #return [random.choice([0, 1]) for _ in range(len(self.items))]
-            pr_chance = get_chance('C:\Users\User\Desktop\Dataset\OR5x100\OR5x100-0.25_1.dat')
+            pr_chance = get_chance(filename)
             return numpy.random.choice([0, 1], size=(len(self.items)), p=[1-pr_chance, pr_chance]).tolist()
     
    
@@ -157,12 +159,14 @@ class myKnapsack(Benchmark):
 prng = Random()
 prng.seed(time()) 
 
-capacities, itemslist = get_problem('C:\Users\User\Desktop\Dataset\OR5x100\OR5x100-0.25_1.dat')
+filename = '/home/ptan/Triforce/Dataset/OR10x100/OR10x100-0.25_1.dat'
+
+capacities, itemslist = get_problem(filename)
 
 
 problem = myKnapsack(capacities, itemslist, duplicates=False) #use custom class
-#ea = inspyred.ec.GA(prng)
-ea = inspyred.swarm.PSO(prng)
+ea = inspyred.ec.GA(prng)
+#ea = inspyred.swarm.PSO(prng)
 ea.terminator = inspyred.ec.terminators.evaluation_termination
 ea.topology = inspyred.swarm.topologies.ring_topology
 
@@ -178,8 +182,8 @@ for i in range(0,5):
                         bounder=problem.bounder,
                         maximize=problem.maximize,
                         max_evaluations=30000, 
-                        neighborhood_size=5)
-                        #num_elites=1)
+                        #neighborhood_size=5)
+                        num_elites=1)
 
     best = max(final_pop)
     fitness_list.append(best.fitness)
