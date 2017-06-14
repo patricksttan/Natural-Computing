@@ -97,6 +97,7 @@ class Knapsack(Benchmark):
 
         return candidate
 
+
     def evaluator(self, candidates,args):
         """Return the fitness values for the given candidates."""
         capa = self.capacity
@@ -117,10 +118,10 @@ class Knapsack(Benchmark):
 #                     total += 0 - abs(capa[i] - sumElement[i])
 
                 fitness.append(total)
-        return fitness
+                return fitness
 
 
-capacities, items = get_problem('/home/ptan/Triforce/Dataset/OR5x100/OR5x100-0.25_1.dat')
+capacities, items = get_problem('/home/ptan/Triforce/Dataset/OR10x100/OR10x100-0.25_1.dat')
 
 
 print("Capacities : ")
