@@ -130,10 +130,7 @@ class myKnapsack(Benchmark):
                 
                 
                 for x in range(0,num_constr):
-                    if list_total_constraints[x] > self.capacity[x]:
-                        fitness.append(sum(self.capacity) - sum(list_total_constraints))
-                        break
-                    else:
+                    if list_total_constraints[x] <= self.capacity[x]:
                         fitness.append(total_value)
         return fitness
 
@@ -148,9 +145,10 @@ def main(prng=None, display=False):
     
     
     problem = myKnapsack(capacities, itemslist, duplicates=False) #use custom class
-    ea = inspyred.ec.GA(prng)
+    #ea = inspyred.ec.GA(prng)
+    ea = inspyred.swarm.PSO(prng)
     ea.terminator = inspyred.ec.terminators.evaluation_termination
-    #ea.topology = inspyred.swarm.topologies.ring_topology
+    ea.topology = inspyred.swarm.topologies.ring_topology
     
     fitness_list = []
     diff_list = []
@@ -163,14 +161,13 @@ def main(prng=None, display=False):
                           bounder=problem.bounder,
                           maximize=problem.maximize,
                           max_evaluations=30000, 
-                          #neighborhood_size=5
-                          num_elites=1)
+                          neighborhood_size=5)
+                          #num_elites=1)
 
-        
         best = max(final_pop)
         fitness_list.append(best.fitness)
              
-        #print('Best Solution: \n{0}'.format(str(best)))
+    print('Fitness list: \n{0}'.format(str(fitness_list)))
     
     best_fitness = max(fitness_list)    
     worst_fitness = min(fitness_list)
